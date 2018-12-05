@@ -25,20 +25,11 @@ exports.index = function(req, res) {
                 })
             }
 
-            // Mutate artists in collection to have _links
-            for(let i = 0; i < artists.length; i++) {
-                artists[i]['_links'] = {}
-                artists[i]._links['self'] = { href: req.protocol + '://' + req.get('host') + req.originalUrl + '/' + artists[i]._id}
-                artists[i]._links['collection'] = { href: req.protocol + '://' + req.get('host') + req.originalUrl}
-            }
-
             // Response JSON
             res.json({
                 items: artists,
                 _links: {
-                    self: {
-                        href: req.protocol + '://' + req.get('host') + req.originalUrl
-                    }
+                    self: { href: req.protocol + '://' + req.get('host') + req.originalUrl }
                 },
                 pagination: {
                     currentPage: 1,
@@ -76,20 +67,15 @@ exports.index = function(req, res) {
 exports.new = function(req, res) {
 
     // Bad Request empty body
-    if(Object.keys(req.body).length === 0) {
+    if(!req.body.name || !req.body.description || !req.body.age) {
         res.sendStatus(400)
     }
     else {
-        let artist = new Artist()
+        let artist = new Artist(req.body)
 
-        artist.name = req.body.name,
-        artist.description = req.body.description
-        artist.age = req.body.age
+        artist._links.self.href = req.protocol + '://' + req.get('host') + req.originalUrl + '/' + artist._id
+        artist._links.collection.href = req.protocol + '://' + req.get('host') + req.originalUrl
 
-        // artist._link = {
-        //     self: { href: req.protocol + '://' + req.get('host') + req.originalUrl + '/' + artist._id },
-        // }
-        
         // Save the artist
         artist.save(function(error) {
             if(error) {
@@ -97,11 +83,8 @@ exports.new = function(req, res) {
                     status: "error",
                     message: error
                 })
-            }
-            res.json({
-                message: 'New Artist created!',
-                data: artist
-            })
+            }   
+            res.status(201).send(artist)
         })
     }
 }
@@ -109,45 +92,53 @@ exports.new = function(req, res) {
 // View artist detail || GET
 exports.view = function(req, res) {
     Artist.findById(req.params.artist_id, function(error, artist) {
-        if(error) {
-            res.json({
-                status: "error",
-                message: error
-            })
+        if(artist !== null) {
+            if(error) {
+                res.status(400).send({message: error})
+            }
+            // Send response
+            res.status(200).send(artist)
         }
-        res.json({
-            message: "Fetching artist details...",
-            data: artist
-        })
+        else {
+            res.status(404).send({message: "Artist not found!"})
+        }
     })
 }
 
 // Update artist || PATCH
 exports.update = function(req, res) {
     Artist.findById(req.params.artist_id, function(error, artist) {
+        
         if(error) {
             res.json({
                 status: "error",
                 message: error
             })
         }
+        else {
+            // Bad Request empty body
+            if (!req.body.name || !req.body.description || !req.body.age) {
+                res.sendStatus(400)
+            }
+            else {       
+                artist.name = req.body.name
+                artist.description = req.body.description
+                artist.age = req.body.age
 
-        artist.name = req.body.name
-        artist.description = req.body.description
-        artist.age = req.body.age
-
-        artist.save(function(error) {
-            if(error) {
-                res.json({
-                    status: "error",
-                    message: error
+                artist.save(function(error) {
+                    if(error) {
+                        res.json({
+                            status: "error",
+                            message: error
+                        })
+                    }
+                    res.json({
+                        message: "Artist info updated",
+                        data: artist
+                    })
                 })
             }
-            res.json({
-                message: "Artist info updated",
-                data: artist
-            })
-        })
+        }
     })
 }
 
@@ -155,16 +146,15 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
     Artist.remove({
         _id: req.params.artist_id
-    }, function(error) {
-        if(error) {
-            res.json({
-                status: "error",
-                message: error
-            })
+    }, function(error, artist) {
+        if(artist !== null) {
+            if(error) {
+                res.status(400).send({message: error})
+            }
+            res.status(204).send({message: "Artist Deleted"})
         }
-        res.json({
-            status: "success",
-            message: "Artist Deleted"
-        })
+        else {
+            res.status(404).send({message: "Artist not found!"})
+        }
     })
 }

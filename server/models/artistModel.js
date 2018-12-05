@@ -12,6 +12,10 @@ const artistSchema = mongoose.Schema({
 	age: {
 		type: String,
 		required: true
+	},
+	_links: {
+		self: {href: String},
+		collection: {href: String}
 	}
 })
 
