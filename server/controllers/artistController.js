@@ -25,7 +25,7 @@ exports.index = async function(req, res)
 
     if(req.accepts('json')) {
 
-        const totalItems = await Artist.countDocuments();;
+        const totalItems = await Artist.countDocuments()
         const start = ( (req.query.start === undefined || parseInt(req.query.start) === 0) ? 0 : parseInt(req.query.start))
         const limit = ( (req.query.limit === undefined || parseInt(req.query.limit) === 0) ? 0 : parseInt(req.query.limit))
 
@@ -39,7 +39,7 @@ exports.index = async function(req, res)
             if(error) {
                 res.status(400).send({message: error})
             }
-            else {
+            else {  
                 // Response JSON
                 res.json({
                     items: artists,
