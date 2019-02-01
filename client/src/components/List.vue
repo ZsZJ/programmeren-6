@@ -1,19 +1,25 @@
 <template>
-  <ul>
-    <ListItem :key="item._id" v-for="item in items" :item="item" />
-  </ul>
+  <div>
+    <ul>
+      <ListItem :key="item._id" v-for="item in items" :item="item" />
+    </ul>
+    <Pagination />
+  </div>
+
 </template>
 
 <script>
 import ListItem from './ListItem'
+import Pagination from './Pagination'
 export default {
   name: 'List',
   components: {
-    ListItem
+    ListItem,
+    Pagination
   },
   props: {
     items: Array
-  }
+  },
 }
 </script>
 

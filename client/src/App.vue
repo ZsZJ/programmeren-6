@@ -10,7 +10,7 @@
     <i @click="this.toggleAdd" class="fas fa-plus-circle"></i>
     
     <!-- Data overview -->
-    <List :items="this.data.items" />
+    <List :items="this.data.items.slice(((this.currentPage - 1) * 5),5 * this.currentPage)" />
     
     <!-- Detail Page -->
     <transition name="slide">
@@ -50,7 +50,9 @@ export default {
           inputValidator: (value) => {
             return !value && 'Artist without name? Interesting...'
           },
-          text: 'Please let it be a good one'
+          text: 'Please let it be a good one',
+          onOpen: this.$store.commit('setAudioToggle'),
+          onAfterClose: () => {this.$store.commit('setAudioToggle')}
         },
         {
           title: 'What is the age of the artist?',
@@ -58,7 +60,8 @@ export default {
           inputValidator: (value) => {
             return !value && 'Please tell me how old...'
           },
-          text: 'If dead please answer: its over 9000'
+          text: 'If dead please answer: its over 9000',
+          onAfterClose: () => {this.$store.commit('setAudioToggle')}
         },
         {
           title: 'Something lovely about the artist?',
@@ -74,7 +77,12 @@ export default {
           Swal.fire({
             title: 'All done!',
             type: 'success',
-            confirmButtonText: 'Nice!'
+            confirmButtonText: 'Nice!',
+            backdrop: `rgba(0,0,123,0.4)
+            url("https://sweetalert2.github.io/images/nyan-cat.gif")
+            center left
+            no-repeat`,
+            onAfterClose: () => {this.$store.commit('setAudioToggle')}
           })
         }
       })
@@ -83,7 +91,9 @@ export default {
   computed: mapState([
     'data',
     'detailShow',
-    'currentItemId'
+    'currentItemId',
+    'audioToggle',
+    'currentPage'
   ]),
   components: {
     List,

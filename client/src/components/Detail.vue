@@ -19,11 +19,13 @@ export default {
     },
     data() {
         return {
-            item: Object
+            item: Object,
+            audio: false
         }
     },
     computed: mapState([
-        'currentItemId'
+        'currentItemId',
+        'audioToggle'
     ]),
     methods: {
         toggleDetail() {
@@ -44,21 +46,24 @@ export default {
             .queue([
                 {
                     title: 'Not satisfied with the name?',
+                    text: 'Get your life together...',
                     input: 'text',
                     inputValue: this.item.name,
                     inputValidator: (value) => {
                         return !value && 'Artist without name? Interesting...'
                     },
-                    text: 'Get your life together...'
+                    onOpen: this.$store.commit('setAudioToggle'),
+                    onAfterClose: () => {this.$store.commit('setAudioToggle')}
                 },
                 {
                     title: 'HAHAHA did the artist age?',
+                    text: 'Sorry im not that good in programming',
                     input: 'text',
                     inputValue: this.item.age,
                     inputValidator: (value) => {
                         return !value && 'Please tell me how old...'
                     },
-                    text: 'Sorry im not that good in programming'
+                    onAfterClose: () => {this.$store.commit('setAudioToggle')}
                 },
                 {
                     title: 'Some more juicy information?',
@@ -68,6 +73,7 @@ export default {
                     inputValidator: (value) => {
                         return !value && 'Please write something nice.'
                     },
+                    onAfterClose: () => {this.$store.commit('setAudioToggle')}
                 },
             ])
             .then((result) => {
@@ -76,7 +82,12 @@ export default {
                     Swal.fire({
                         title: 'Update done!',
                         type: 'success',
-                        confirmButtonText: 'Im cool!'
+                        confirmButtonText: 'Im cool!',
+                        backdrop: `rgba(0,0,123,0.4)
+                        url("https://sweetalert2.github.io/images/nyan-cat.gif")
+                        center left
+                        no-repeat`,
+                        onAfterClose: () => {this.$store.commit('setAudioToggle')}
                     })
                 }
             })

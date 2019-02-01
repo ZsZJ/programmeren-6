@@ -8,9 +8,25 @@ export default new Vuex.Store({
   state: {
     data: Array,
     detailShow: false,
-    currentItemId : 0
+    audioToggle: false,
+    audio: new Audio("https://ia600501.us.archive.org/33/items/nyannyannyan/NyanCatoriginal.mp3"),
+    currentItemId : 0,
+    currentPage : 1
   },
   mutations: {
+    setCurrentPage(state, number) {
+      state.currentPage = number
+    },
+    setAudioToggle(state) {
+      state.audioToggle = !state.audioToggle
+      if(state.audioToggle) {
+        state.audio.play()
+      }
+      else {
+        state.audio.pause();
+        state.audio.currentTime = 0;
+      }
+    },
     setApiData (state, data) {
       state.data = data
     },
